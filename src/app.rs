@@ -1,4 +1,5 @@
 use crate::array2d::{Array2D, GridPos};
+use crate::sim::{Sim, GridCell};
 use eframe::egui::{DragValue, Grid, Rgba, RichText, ScrollArea, Slider, Ui};
 use egui::os::OperatingSystem;
 use egui::{CentralPanel, Frame, Rect, Sense};
@@ -88,26 +89,6 @@ impl TemplateApp {
     fn settings_gui(&mut self, ui: &mut Ui) {
         ui.label("Baba booey");
     }
-}
-
-#[derive(Clone, Default, Copy)]
-pub struct GridCell {
-    prob: [f32; 9],
-}
-
-#[derive(Clone)]
-struct Sim {
-    grid: Array2D<GridCell>,
-}
-
-impl Sim {
-    pub fn new(width: usize, height: usize) -> Self {
-        Sim {
-            grid: Array2D::new(width, height),
-        }
-    }
-
-    pub fn step(&mut self, omega: f32) {}
 }
 
 /// Maps sim coordinates to/from egui coordinates
