@@ -1,8 +1,8 @@
 use crate::array2d::{Array2D, GridPos};
 use eframe::egui::{DragValue, Grid, Rgba, RichText, ScrollArea, Slider, Ui};
 use egui::os::OperatingSystem;
-use egui::{SidePanel, Color32, Rounding};
 use egui::{CentralPanel, Frame, Rect, Sense};
+use egui::{Color32, Rounding, SidePanel};
 use glam::Vec2;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
@@ -41,9 +41,7 @@ impl eframe::App for TemplateApp {
 
         // Update
         if !self.pause || self.single_step {
-            self.sim.step(
-                self.omega
-            );
+            self.sim.step(self.omega);
         }
 
         // Update continuously
@@ -103,20 +101,13 @@ struct Sim {
 }
 
 impl Sim {
-    pub fn new(
-        width: usize,
-        height: usize,
-    ) -> Self {
+    pub fn new(width: usize, height: usize) -> Self {
         Sim {
             grid: Array2D::new(width, height),
         }
     }
 
-    pub fn step(
-        &mut self,
-        omega: f32,
-    ) {
-    }
+    pub fn step(&mut self, omega: f32) {}
 }
 
 /// Maps sim coordinates to/from egui coordinates
@@ -128,6 +119,9 @@ struct CoordinateMapping {
 
 impl CoordinateMapping {
     pub fn new(grid: &Array2D<GridCell>, area: Rect) -> Self {
+        //let area = Rect::from_center_size(area.center(), egui::Vec2::splat(area.width().min(area.height())));
+        let area = Rect::from_min_size(area.min, egui::Vec2::splat(area.width().min(area.height())));
+
         Self {
             width: grid.width() as f32 - 1.,
             height: grid.height() as f32 - 1.,
@@ -146,10 +140,11 @@ impl CoordinateMapping {
         egui::Pos2::new(
             (pt.x / self.width) * self.area.width(),
             (1. - pt.y / self.height) * self.area.height(),
-        )
+        ) + self.area.left_top().to_vec2()
     }
 
     pub fn egui_to_sim(&self, pt: egui::Pos2) -> glam::Vec2 {
+        let pt = pt - self.area.left_top().to_vec2();
         glam::Vec2::new(
             (pt.x / self.area.width()) * self.width,
             (1. - pt.y / self.area.height()) * self.height,
@@ -167,4 +162,3 @@ impl CoordinateMapping {
 fn is_mobile(ctx: &egui::Context) -> bool {
     matches!(ctx.os(), OperatingSystem::Android | OperatingSystem::IOS)
 }
-
