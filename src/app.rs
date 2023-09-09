@@ -24,7 +24,7 @@ impl TemplateApp {
         let width = 200;
         let height = 200;
         let sim = Sim::new(width, height);
-        let omega = 0.1;
+        let omega = 1.;
 
         Self {
             sim,
@@ -71,12 +71,12 @@ impl TemplateApp {
     fn sim_widget(&mut self, ui: &mut Ui) {
         let (rect, response) = ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
 
-        let coords = CoordinateMapping::new(&self.sim.grid, rect);
+        let coords = CoordinateMapping::new(&self.sim.prob, rect);
 
         let painter = ui.painter_at(rect);
         let square_size = coords.sim_to_egui_vect(Vec2::ONE);
-        for j in 0..self.sim.grid.height() {
-            for i in 0..self.sim.grid.width() {
+        for j in 0..self.sim.prob.height() {
+            for i in 0..self.sim.prob.width() {
                 let min = Vec2::new(i as f32, j as f32);
                 let min = coords.sim_to_egui(min);
                 let rect = Rect::from_min_size(min, square_size.abs());
@@ -87,7 +87,7 @@ impl TemplateApp {
     }
 
     fn settings_gui(&mut self, ui: &mut Ui) {
-        ui.label("Baba booey");
+        ui.add(DragValue::new(&mut self.omega).prefix("Omega: ").clamp_range(0.0..=2.0).speed(1e-2));
     }
 }
 

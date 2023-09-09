@@ -7,13 +7,13 @@ pub struct GridCell {
 
 #[derive(Clone)]
 pub struct Sim {
-    pub grid: Array2D<GridCell>,
+    pub prob: Array2D<GridCell>,
 }
 
 impl Sim {
     pub fn new(width: usize, height: usize) -> Self {
         Sim {
-            grid: Array2D::new(width, height),
+            prob: Array2D::new(width, height),
         }
     }
 
