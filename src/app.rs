@@ -20,7 +20,7 @@ pub struct TemplateApp {
 }
 
 fn new_sim() -> Sim {
-    Sim::new(20, 20)
+    Sim::new(200, 200)
 }
 
 impl TemplateApp {
@@ -32,7 +32,7 @@ impl TemplateApp {
         Self {
             sim,
             omega,
-            pause: true,
+            pause: false,
             single_step: false,
             show_settings_only: false,
         }
@@ -45,7 +45,7 @@ impl eframe::App for TemplateApp {
 
         // Update
         if !self.pause || self.single_step {
-            self.sim.grid_mut()[(10, 10)][(0, 0)] = 0.1;
+            self.sim.grid_mut()[(100, 100)][(0, 0)] = 1.;
             self.sim.step(self.omega);
             self.single_step = false;
         }
