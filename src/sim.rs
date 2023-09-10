@@ -62,6 +62,14 @@ impl Sim {
         }
 
         std::mem::swap(&mut self.read, &mut self.write);
+
+        println!("########################################");
+        for y in 0..self.read.height() {
+            for x in 0..self.read.width() {
+                let vel = calc_total_avg_velocity(&self.read[(x, y)]);
+                println!("({x}, {y}): {vel}");
+            }
+        }
     }
 
     pub fn grid(&self) -> &Array2D<GridCell<f32>> {
