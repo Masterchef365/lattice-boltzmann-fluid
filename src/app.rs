@@ -45,7 +45,7 @@ impl eframe::App for TemplateApp {
 
         // Update
         if !self.pause || self.single_step {
-            self.sim.grid_mut()[(10, 10)][(0, 0)] = 10.;
+            self.sim.grid_mut()[(10, 10)][(0, 0)] = 0.1;
             self.sim.step(self.omega);
             self.single_step = false;
         }
@@ -87,7 +87,7 @@ impl TemplateApp {
                 let rect = Rect::from_min_size(min, square_size.abs());
                 let coord = (i, j);
 
-                let vel = calc_total_avg_velocity(&self.sim.grid()[coord]);
+                let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
                 let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
                 painter.rect_filled(rect, Rounding::none(), color);

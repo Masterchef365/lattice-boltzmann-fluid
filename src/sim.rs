@@ -63,6 +63,7 @@ impl Sim {
 
         std::mem::swap(&mut self.read, &mut self.write);
 
+        /*
         println!("########################################");
         for y in 0..self.read.height() {
             for x in 0..self.read.width() {
@@ -70,6 +71,7 @@ impl Sim {
                 println!("({x}, {y}): {vel}");
             }
         }
+        */
     }
 
     pub fn grid(&self) -> &Array2D<GridCell<f32>> {
@@ -90,10 +92,7 @@ impl Sim {
 fn relative_index(xy: (usize, usize), uv: (i32, i32)) -> (usize, usize) {
     let (x, y) = xy;
     let (u, v) = uv;
-    (
-        (x as i32 + u) as usize,
-        (y as i32 + v) as usize,
-    )
+    ((x as i32 + u) as usize, (y as i32 + v) as usize)
 }
 
 /// D2Q9 weights
@@ -128,11 +127,7 @@ fn velocities() -> GridCell<Vec2> {
 }
 
 fn calc_total_density(cell: &GridCell<f32>) -> f32 {
-    cell.data()
-        .iter()
-        .zip(weights().data())
-        .map(|(prob, weight)| prob * weight)
-        .sum()
+    cell.data().iter().copied().sum()
 }
 
 pub fn calc_total_avg_velocity(cell: &GridCell<f32>) -> Vec2 {
