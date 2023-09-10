@@ -68,6 +68,12 @@ impl Sim {
         &self.read
     }
 
+    pub fn grid_mut(&mut self) -> &mut Array2D<GridCell<f32>> {
+        // This is counterintuitive, but the READ buffer will be read by the next sim step in order
+        // to write to the WRITE buffer. So we want to modify which thing will be read.
+        &mut self.read
+    }
+
     pub fn bounds_mut(&mut self) -> &mut Array2D<bool> {
         &mut self.bounds
     }

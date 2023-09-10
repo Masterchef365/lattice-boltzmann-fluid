@@ -19,18 +19,20 @@ pub struct TemplateApp {
     show_settings_only: bool,
 }
 
+fn new_sim() -> Sim {
+    Sim::new(50, 50)
+}
+
 impl TemplateApp {
     /// Called once before the first frame.
-    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        let width = 200;
-        let height = 200;
-        let sim = Sim::new(width, height);
+    pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
+        let sim = new_sim();
         let omega = 1.;
 
         Self {
             sim,
             omega,
-            pause: false,
+            pause: true,
             single_step: false,
             show_settings_only: false,
         }
@@ -43,7 +45,9 @@ impl eframe::App for TemplateApp {
 
         // Update
         if !self.pause || self.single_step {
+            self.sim.grid_mut()[(10, 10)][(0, 0)] = 100.;
             self.sim.step(self.omega);
+            self.single_step = false;
         }
 
         // Update continuously
@@ -70,7 +74,7 @@ impl eframe::App for TemplateApp {
 
 impl TemplateApp {
     fn sim_widget(&mut self, ui: &mut Ui) {
-        let (rect, response) = ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
+        let (rect, _response) = ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
 
         let coords = CoordinateMapping::new(&self.sim.grid(), rect);
 
@@ -92,7 +96,14 @@ impl TemplateApp {
     }
 
     fn settings_gui(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            ui.checkbox(&mut self.pause, "Pause");
+            self.single_step |= ui.button("Step").clicked();
+        });
         ui.add(DragValue::new(&mut self.omega).prefix("Omega: ").clamp_range(0.0..=2.0).speed(1e-2));
+        if ui.button("Reset").clicked() {
+            self.sim = new_sim();
+        }
     }
 }
 
