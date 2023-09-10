@@ -1,5 +1,6 @@
 use crate::array2d::{Array2D, GridPos};
-use crate::sim::{Sim, GridCell};
+use crate::cell::GridCell;
+use crate::sim::{Sim, calc_total_avg_velocity};
 use eframe::egui::{DragValue, Grid, Rgba, RichText, ScrollArea, Slider, Ui};
 use egui::os::OperatingSystem;
 use egui::{CentralPanel, Frame, Rect, Sense};
@@ -71,16 +72,20 @@ impl TemplateApp {
     fn sim_widget(&mut self, ui: &mut Ui) {
         let (rect, response) = ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
 
-        let coords = CoordinateMapping::new(&self.sim.prob, rect);
+        let coords = CoordinateMapping::new(&self.sim.grid(), rect);
 
         let painter = ui.painter_at(rect);
         let square_size = coords.sim_to_egui_vect(Vec2::ONE);
-        for j in 0..self.sim.prob.height() {
-            for i in 0..self.sim.prob.width() {
+        for j in 0..self.sim.grid().height() {
+            for i in 0..self.sim.grid().width() {
                 let min = Vec2::new(i as f32, j as f32);
                 let min = coords.sim_to_egui(min);
                 let rect = Rect::from_min_size(min, square_size.abs());
-                let color = Color32::from_rgb((i % 256) as u8, (j % 256) as u8, 0);
+                let coord = (i, j);
+
+                let vel = calc_total_avg_velocity(&self.sim.grid()[coord]);
+
+                let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
                 painter.rect_filled(rect, Rounding::none(), color);
             }
         }
@@ -99,7 +104,7 @@ struct CoordinateMapping {
 }
 
 impl CoordinateMapping {
-    pub fn new(grid: &Array2D<GridCell>, area: Rect) -> Self {
+    pub fn new(grid: &Array2D<GridCell<f32>>, area: Rect) -> Self {
         //let area = Rect::from_center_size(area.center(), egui::Vec2::splat(area.width().min(area.height())));
         let area = Rect::from_min_size(area.min, egui::Vec2::splat(area.width().min(area.height())));
 
