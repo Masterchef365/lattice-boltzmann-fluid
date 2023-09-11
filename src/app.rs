@@ -20,7 +20,7 @@ pub struct TemplateApp {
 }
 
 fn new_sim() -> Sim {
-    Sim::new(200, 200)
+    Sim::new(20, 20)
 }
 
 impl TemplateApp {
@@ -54,7 +54,7 @@ impl eframe::App for TemplateApp {
             /*for k in 10..90 {
                 self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
             }*/
-            self.sim.grid_mut()[(50, 50)][(1, 1)] = 1.;
+            self.sim.grid_mut()[(10, 10)][(0, 0)] = 0.4;
             self.sim.step(self.omega);
             self.single_step = false;
         }
@@ -98,7 +98,13 @@ impl TemplateApp {
 
                 let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
-                let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
+                //let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
+                let color = if self.sim.bounds_mut()[coord] {
+                    Color32::RED
+                } else {
+                    Color32::DARK_GRAY
+                };
+
                 painter.rect_filled(rect, Rounding::none(), color);
             }
         }
@@ -129,8 +135,8 @@ impl CoordinateMapping {
         let area = Rect::from_min_size(area.min, egui::Vec2::splat(area.width().min(area.height())));
 
         Self {
-            width: grid.width() as f32 - 1.,
-            height: grid.height() as f32 - 1.,
+            width: grid.width() as f32,
+            height: grid.height() as f32,
             area,
         }
     }
@@ -145,7 +151,7 @@ impl CoordinateMapping {
     pub fn sim_to_egui(&self, pt: glam::Vec2) -> egui::Pos2 {
         egui::Pos2::new(
             (pt.x / self.width) * self.area.width(),
-            (1. - pt.y / self.height) * self.area.height(),
+            (pt.y / self.height) * self.area.height(),
         ) + self.area.left_top().to_vec2()
     }
 
@@ -153,7 +159,7 @@ impl CoordinateMapping {
         let pt = pt - self.area.left_top().to_vec2();
         glam::Vec2::new(
             (pt.x / self.area.width()) * self.width,
-            (1. - pt.y / self.area.height()) * self.height,
+            (pt.y / self.area.height()) * self.height,
         )
     }
 
