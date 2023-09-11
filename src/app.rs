@@ -96,6 +96,7 @@ impl TemplateApp {
                 let min = Vec2::new(i as f32, j as f32);
                 let min = coords.sim_to_egui(min);
                 let rect = Rect::from_min_size(min, square_size.abs());
+                let rect = rect.expand(1.);
                 let coord = (i, j);
 
                 let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
