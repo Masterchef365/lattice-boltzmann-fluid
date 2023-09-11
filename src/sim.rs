@@ -134,7 +134,7 @@ pub fn calc_total_avg_velocity(cell: &GridCell<f32>) -> Vec2 {
     cell.data()
         .iter()
         .zip(velocities().data())
-        .map(|(vel, weight)| *weight * *vel)
+        .map(|(prob, vel)| *vel * *prob)
         .sum()
 }
 
