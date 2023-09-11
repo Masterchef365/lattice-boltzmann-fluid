@@ -99,7 +99,7 @@ impl TemplateApp {
                 let rect = rect.expand(1.);
                 let coord = (i, j);
 
-                let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
+                let vel = 2560.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
                 let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
 
