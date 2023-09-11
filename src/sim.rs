@@ -53,7 +53,6 @@ impl Sim {
                         let (u, v) = uv;
                         let rev_idx = relative_index((1, 1), (-u, -v));
                         self.write[(x, y)][rev_idx] += self.read[(x, y)][inner_idx];
-                        //println!("{:?}, {:?}", inner_idx, rev_idx);
                     } else {
                         // No boundary, use fluid transport
                         self.write[adj_coord][inner_idx] += self.read[(x, y)][inner_idx];

@@ -98,12 +98,7 @@ impl TemplateApp {
 
                 let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
-                //let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
-                let color = if self.sim.bounds_mut()[coord] {
-                    Color32::RED
-                } else {
-                    Color32::DARK_GRAY
-                };
+                let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
 
                 painter.rect_filled(rect, Rounding::none(), color);
             }
