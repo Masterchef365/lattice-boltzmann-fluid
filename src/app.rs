@@ -45,7 +45,16 @@ impl eframe::App for TemplateApp {
 
         // Update
         if !self.pause || self.single_step {
-            self.sim.grid_mut()[(100, 100)][(0, 0)] = 1.;
+            /*
+            for k in 90..=110 {
+                self.sim.bounds_mut()[(k, 105)] = true;
+            }
+            */
+            //self.sim.grid_mut()[(100, 100)][(1, 1)] = -0.5;
+            /*for k in 10..90 {
+                self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
+            }*/
+            self.sim.grid_mut()[(50, 50)][(1, 1)] = 1.;
             self.sim.step(self.omega);
             self.single_step = false;
         }
