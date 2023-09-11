@@ -14,7 +14,8 @@ pub struct Sim {
 
 impl Sim {
     pub fn new(width: usize, height: usize) -> Self {
-        let read = Array2D::new(width, height);
+        let mut read = Array2D::new(width, height);
+        read.data_mut().iter_mut().for_each(|cell| { *cell = weights() });
 
         Sim {
             write: read.clone(),
@@ -45,6 +46,10 @@ impl Sim {
         // Streaming step
         for y in 1..self.read.height() - 1 {
             for x in 1..self.read.width() - 1 {
+                if self.bounds[(x, y)] { 
+                    continue;
+                }
+
                 for uv in velocities_i32().data() {
                     let adj_coord = relative_index((x, y), *uv);
                     let inner_idx = relative_index((1, 1), *uv);
