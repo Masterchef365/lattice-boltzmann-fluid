@@ -20,7 +20,7 @@ pub struct TemplateApp {
 }
 
 fn new_sim() -> Sim {
-    Sim::new(20, 20)
+    Sim::new(60, 60)
 }
 
 impl TemplateApp {
@@ -54,7 +54,9 @@ impl eframe::App for TemplateApp {
             /*for k in 10..90 {
                 self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
             }*/
-            self.sim.grid_mut()[(10, 10)][(0, 0)] = 0.4;
+            self.sim.grid_mut()[(20, 30)][(0, 0)] = 0.4;
+            bound_circle(self.sim.bounds_mut(), (30, 30), 5);
+
             self.sim.step(self.omega);
             self.single_step = false;
         }
@@ -168,4 +170,23 @@ impl CoordinateMapping {
 
 fn is_mobile(ctx: &egui::Context) -> bool {
     matches!(ctx.os(), OperatingSystem::Android | OperatingSystem::IOS)
+}
+
+fn bound_circle(arr: &mut Array2D<bool>, center: (i32, i32), radius: i32) {
+    let (x, y) = center;
+
+    for i in -radius..=radius {
+        for j in -radius..=radius {
+            if i*i + j*j < radius*radius {
+                if let Some(coord) = bound_check((i + x, j + y), arr) {
+                    arr[coord] = true;
+                }
+            }
+        }
+    }
+}
+
+fn bound_check<T>((x, y): (i32, i32), arr: &Array2D<T>) -> Option<(usize, usize)> {
+    let in_bound = x >= 0 && y >= 0 && x < arr.width() as i32 && y < arr.height() as i32;
+    in_bound.then(|| (x as usize, y as usize))
 }
