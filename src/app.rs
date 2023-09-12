@@ -54,8 +54,8 @@ impl eframe::App for TemplateApp {
             /*for k in 10..90 {
                 self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
             }*/
-            self.sim.grid_mut()[(20, 30)][(0, 0)] = 0.1;
-            bound_circle(self.sim.bounds_mut(), (30, 30), 5);
+            self.sim.grid_mut()[(20, 30)][(2, 1)] = 0.3;
+            bound_circle(self.sim.bounds_mut(), (30, 35), 5);
 
             self.sim.step(self.omega);
             self.single_step = false;
