@@ -1282,6 +1282,7 @@ dependencies = [
  "env_logger",
  "glam",
  "log",
+ "rand",
  "wasm-bindgen-futures",
 ]
 

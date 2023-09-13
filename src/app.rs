@@ -3,14 +3,16 @@ use crate::cell::GridCell;
 use crate::sim::{Sim, calc_total_avg_velocity, calc_equilibrium_predict, calc_total_density, weights};
 use eframe::egui::{DragValue, Grid, Rgba, RichText, ScrollArea, Slider, Ui};
 use egui::os::OperatingSystem;
-use egui::{CentralPanel, Frame, Rect, Sense};
+use egui::{CentralPanel, Frame, Rect, Sense, Stroke};
 use egui::{Color32, Rounding, SidePanel};
 use glam::Vec2;
+use rand::prelude::*;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 pub struct TemplateApp {
     // Sim state
     sim: Sim,
+    parts: Streamers,
 
     // Settings
     omega: f32,
@@ -27,9 +29,10 @@ impl TemplateApp {
     /// Called once before the first frame.
     pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         let sim = new_sim();
-        let omega = 1.;
+        let omega = 1.8;
 
         Self {
+            parts: Streamers::new(5000, sim.grid()),
             sim,
             omega,
             pause: false,
@@ -62,6 +65,7 @@ impl eframe::App for TemplateApp {
             bound_circle(self.sim.bounds_mut(), (30, 35), 5);
 
             self.sim.step(self.omega);
+            self.parts.step(self.sim.grid());
             self.single_step = false;
         }
 
@@ -94,6 +98,8 @@ impl TemplateApp {
         let coords = CoordinateMapping::new(&self.sim.grid(), rect);
 
         let painter = ui.painter_at(rect);
+
+        /*
         let square_size = coords.sim_to_egui_vect(Vec2::ONE);
         for j in 0..self.sim.grid().height() {
             for i in 0..self.sim.grid().width() {
@@ -109,6 +115,12 @@ impl TemplateApp {
 
                 painter.rect_filled(rect, Rounding::none(), color);
             }
+        }
+        */
+
+        for part in &self.parts.particles {
+            let pt = coords.sim_to_egui(*part);
+            painter.circle_filled(pt, 1., Color32::WHITE);
         }
     }
 
@@ -204,4 +216,41 @@ pub fn force_unit_density(mut cell: GridCell<f32>) -> GridCell<f32> {
         cell.data_mut().iter_mut().for_each(|x| *x /= total);
         cell
     }
+}
+
+struct Streamers {
+    pub particles: Vec<Vec2>,
+}
+
+impl Streamers {
+    pub fn new(n: usize, grid: &Array2D<GridCell<f32>>) -> Self {
+        let mut particles = vec![];
+        for _ in 0..n {
+            particles.push(random_particle(grid));
+        }
+
+        Self {
+            particles,
+        }
+    }
+
+    pub fn step(&mut self, grid: &Array2D<GridCell<f32>>) {
+        for part in &mut self.particles {
+            if part.x < 1. || part.y < 1. || part.x > grid.width() as f32 - 1. || part.y > grid.height() as f32 - 1. {
+                *part = random_particle(grid);
+            } else {
+                let coord = (part.x as usize, part.y as usize);
+                let vel = calc_total_avg_velocity(&grid[coord]);
+                *part += vel;
+            }
+        }
+    }
+}
+
+fn random_particle(grid: &Array2D<GridCell<f32>>) -> Vec2 {
+    let mut rng = rand::thread_rng();
+    Vec2::new(
+        rng.gen_range(1.0..=grid.width() as f32 - 1.),
+        rng.gen_range(1.0..=grid.height() as f32 - 1.),
+    )
 }
