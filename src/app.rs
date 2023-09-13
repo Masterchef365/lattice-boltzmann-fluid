@@ -70,10 +70,11 @@ impl eframe::App for TemplateApp {
                 grid.data_mut().iter_mut().for_each(|cell| *cell = force_unit_density(*cell));
 
 
+                bound_circle(self.sim.bounds_mut(), (20, 22), 5);
                 bound_circle(self.sim.bounds_mut(), (30, 35), 5);
 
                 self.sim.step(self.omega);
-                self.parts.step(self.sim.grid());
+                self.parts.step(self.sim.grid(), self.sim.bounds());
                 self.single_step = false;
             }
         }
@@ -243,13 +244,13 @@ impl Streamers {
         }
     }
 
-    pub fn step(&mut self, grid: &Array2D<GridCell<f32>>) {
+    pub fn step(&mut self, grid: &Array2D<GridCell<f32>>, bound: &Array2D<bool>) {
         for part in &mut self.particles {
-            if part.x < 1. || part.y < 1. || part.x > grid.width() as f32 - 2. || part.y > grid.height() as f32 - 2. {
+            let x = part.x as usize;
+            let y = part.y as usize;
+            if bound[(x, y)] || bound[(x + 1, y + 1)] {
                 *part = random_particle(grid);
             } else {
-                let x = part.x as usize;
-                let y = part.y as usize;
                 let tl = calc_total_avg_velocity(&grid[(x, y)]);
                 let tr = calc_total_avg_velocity(&grid[(x + 1, y)]);
                 let bl = calc_total_avg_velocity(&grid[(x, y + 1)]);

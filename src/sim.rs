@@ -92,6 +92,10 @@ impl Sim {
     pub fn bounds_mut(&mut self) -> &mut Array2D<bool> {
         &mut self.bounds
     }
+
+    pub fn bounds(&self) -> &Array2D<bool> {
+        &self.bounds
+    }
 }
 
 fn relative_index(xy: (usize, usize), uv: (i32, i32)) -> (usize, usize) {
