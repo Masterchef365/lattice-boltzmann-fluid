@@ -56,11 +56,8 @@ impl eframe::App for TemplateApp {
             }*/
             let point = (20, 30);
             let grid = self.sim.grid_mut();
-            grid[point][(2, 1)] = 0.3;
-            dbg!(calc_total_density(&grid[point]));
-            //grid[point] = calc_equilibrium_predict(&grid[point]);
+            grid[point][(2, 1)] = 0.1;
             grid[point] = force_unit_density(grid[point]);
-            dbg!(calc_total_density(&grid[point]));
 
             bound_circle(self.sim.bounds_mut(), (30, 35), 5);
 
@@ -106,7 +103,7 @@ impl TemplateApp {
                 let rect = rect.expand(1.);
                 let coord = (i, j);
 
-                let vel = 2560.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
+                let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
                 let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
 
