@@ -58,15 +58,19 @@ impl eframe::App for TemplateApp {
                 /*for k in 10..90 {
                   self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
                   }*/
+                let grid = self.sim.grid_mut();
+
                 for k in 28..=32 {
                     let point = (20, k);
-                    let grid = self.sim.grid_mut();
                     grid[point][(0, 1)] = 0.1;
-                    grid[point] = calc_equilibrium_predict(&grid[point]);
-                    grid[point] = force_unit_density(grid[point]);
+                    //grid[point] = calc_equilibrium_predict(&grid[point]);
+                    //grid[point] = force_unit_density(grid[point]);
                 }
 
-                //bound_circle(self.sim.bounds_mut(), (30, 35), 5);
+                grid.data_mut().iter_mut().for_each(|cell| *cell = force_unit_density(*cell));
+
+
+                bound_circle(self.sim.bounds_mut(), (30, 35), 5);
 
                 self.sim.step(self.omega);
                 self.parts.step(self.sim.grid());
