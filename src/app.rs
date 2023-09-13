@@ -1,6 +1,8 @@
 use crate::array2d::{Array2D, GridPos};
 use crate::cell::GridCell;
-use crate::sim::{Sim, calc_total_avg_velocity, calc_equilibrium_predict, calc_total_density, weights};
+use crate::sim::{
+    calc_equilibrium_predict, calc_total_avg_velocity, calc_total_density, weights, Sim,
+};
 use eframe::egui::{DragValue, Grid, Rgba, RichText, ScrollArea, Slider, Ui};
 use egui::os::OperatingSystem;
 use egui::{CentralPanel, Frame, Rect, Sense, Stroke};
@@ -50,14 +52,14 @@ impl eframe::App for TemplateApp {
         for _ in 0..10 {
             if !self.pause || self.single_step {
                 /*
-                   for k in 90..=110 {
-                   self.sim.bounds_mut()[(k, 105)] = true;
-                   }
-                   */
+                for k in 90..=110 {
+                self.sim.bounds_mut()[(k, 105)] = true;
+                }
+                */
                 //self.sim.grid_mut()[(100, 100)][(1, 1)] = -0.5;
                 /*for k in 10..90 {
-                  self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
-                  }*/
+                self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
+                }*/
                 let grid = self.sim.grid_mut();
 
                 for k in 28..=32 {
@@ -67,8 +69,9 @@ impl eframe::App for TemplateApp {
                     //grid[point] = force_unit_density(grid[point]);
                 }
 
-                grid.data_mut().iter_mut().for_each(|cell| *cell = force_unit_density(*cell));
-
+                grid.data_mut()
+                    .iter_mut()
+                    .for_each(|cell| *cell = force_unit_density(*cell));
 
                 bound_circle(self.sim.bounds_mut(), (20, 22), 5);
                 bound_circle(self.sim.bounds_mut(), (30, 35), 5);
@@ -103,30 +106,46 @@ impl eframe::App for TemplateApp {
 
 impl TemplateApp {
     fn sim_widget(&mut self, ui: &mut Ui) {
-        let (rect, _response) = ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
+        let (rect, _response) =
+            ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
 
         let coords = CoordinateMapping::new(&self.sim.grid(), rect);
 
         let painter = ui.painter_at(rect);
 
         /*
-           let square_size = coords.sim_to_egui_vect(Vec2::ONE);
-           for j in 0..self.sim.grid().height() {
-           for i in 0..self.sim.grid().width() {
-           let min = Vec2::new(i as f32, j as f32);
-           let min = coords.sim_to_egui(min);
-           let rect = Rect::from_min_size(min, square_size.abs());
-           let rect = rect.expand(1.);
-           let coord = (i, j);
+        let square_size = coords.sim_to_egui_vect(Vec2::ONE);
+        for j in 0..self.sim.grid().height() {
+        for i in 0..self.sim.grid().width() {
+        let min = Vec2::new(i as f32, j as f32);
+        let min = coords.sim_to_egui(min);
+        let rect = Rect::from_min_size(min, square_size.abs());
+        let rect = rect.expand(1.);
+        let coord = (i, j);
 
-           let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
+        let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
-           let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
+        let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
 
-           painter.rect_filled(rect, Rounding::none(), color);
-           }
-           }
-           */
+        painter.rect_filled(rect, Rounding::none(), color);
+        }
+        }
+        */
+
+        let square_size = coords.sim_to_egui_vect(Vec2::ONE);
+        for j in 0..self.sim.grid().height() {
+            for i in 0..self.sim.grid().width() {
+                let min = Vec2::new(i as f32, j as f32);
+                let min = coords.sim_to_egui(min);
+                let rect = Rect::from_min_size(min, square_size.abs());
+                let rect = rect.expand(1.);
+                let coord = (i, j);
+
+                if self.sim.bounds()[coord] {
+                    painter.rect_filled(rect, Rounding::none(), Color32::DARK_RED);
+                }
+            }
+        }
 
         for part in &self.parts.particles {
             let pt = coords.sim_to_egui(*part);
@@ -139,7 +158,12 @@ impl TemplateApp {
             ui.checkbox(&mut self.pause, "Pause");
             self.single_step |= ui.button("Step").clicked();
         });
-        ui.add(DragValue::new(&mut self.omega).prefix("Omega: ").clamp_range(0.0..=2.0).speed(1e-2));
+        ui.add(
+            DragValue::new(&mut self.omega)
+                .prefix("Omega: ")
+                .clamp_range(0.0..=2.0)
+                .speed(1e-2),
+        );
         if ui.button("Reset").clicked() {
             self.sim = new_sim();
         }
@@ -156,7 +180,8 @@ struct CoordinateMapping {
 impl CoordinateMapping {
     pub fn new(grid: &Array2D<GridCell<f32>>, area: Rect) -> Self {
         //let area = Rect::from_center_size(area.center(), egui::Vec2::splat(area.width().min(area.height())));
-        let area = Rect::from_min_size(area.min, egui::Vec2::splat(area.width().min(area.height())));
+        let area =
+            Rect::from_min_size(area.min, egui::Vec2::splat(area.width().min(area.height())));
 
         Self {
             width: grid.width() as f32,
@@ -204,7 +229,7 @@ fn bound_circle(arr: &mut Array2D<bool>, center: (i32, i32), radius: i32) {
 
     for i in -radius..=radius {
         for j in -radius..=radius {
-            if i*i + j*j < radius*radius {
+            if i * i + j * j < radius * radius {
                 if let Some(coord) = bound_check((i + x, j + y), arr) {
                     arr[coord] = true;
                 }
@@ -239,16 +264,14 @@ impl Streamers {
             particles.push(random_particle(grid));
         }
 
-        Self {
-            particles,
-        }
+        Self { particles }
     }
 
     pub fn step(&mut self, grid: &Array2D<GridCell<f32>>, bound: &Array2D<bool>) {
         for part in &mut self.particles {
             let x = part.x as usize;
             let y = part.y as usize;
-            if bound[(x, y)] || bound[(x + 1, y + 1)] {
+            if bound[(x, y)] {
                 *part = random_particle(grid);
             } else {
                 let tl = calc_total_avg_velocity(&grid[(x, y)]);
