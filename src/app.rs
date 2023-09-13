@@ -245,11 +245,19 @@ impl Streamers {
 
     pub fn step(&mut self, grid: &Array2D<GridCell<f32>>) {
         for part in &mut self.particles {
-            if part.x < 1. || part.y < 1. || part.x > grid.width() as f32 - 1. || part.y > grid.height() as f32 - 1. {
+            if part.x < 1. || part.y < 1. || part.x > grid.width() as f32 - 2. || part.y > grid.height() as f32 - 2. {
                 *part = random_particle(grid);
             } else {
-                let coord = (part.x as usize, part.y as usize);
-                let vel = calc_total_avg_velocity(&grid[coord]);
+                let x = part.x as usize;
+                let y = part.y as usize;
+                let tl = calc_total_avg_velocity(&grid[(x, y)]);
+                let tr = calc_total_avg_velocity(&grid[(x + 1, y)]);
+                let bl = calc_total_avg_velocity(&grid[(x, y + 1)]);
+                let br = calc_total_avg_velocity(&grid[(x + 1, y + 1)]);
+                let frac = part.fract();
+                let top = tl.lerp(tr, frac.x);
+                let bottom = bl.lerp(br, frac.x);
+                let vel = top.lerp(bottom, frac.y);
                 *part += vel;
             }
         }
