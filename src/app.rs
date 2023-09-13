@@ -47,26 +47,31 @@ impl eframe::App for TemplateApp {
         ctx.set_visuals(egui::Visuals::dark());
 
         // Update
-        if !self.pause || self.single_step {
-            /*
-            for k in 90..=110 {
-                self.sim.bounds_mut()[(k, 105)] = true;
+        for _ in 0..10 {
+            if !self.pause || self.single_step {
+                /*
+                   for k in 90..=110 {
+                   self.sim.bounds_mut()[(k, 105)] = true;
+                   }
+                   */
+                //self.sim.grid_mut()[(100, 100)][(1, 1)] = -0.5;
+                /*for k in 10..90 {
+                  self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
+                  }*/
+                for k in 28..=32 {
+                    let point = (20, k);
+                    let grid = self.sim.grid_mut();
+                    grid[point][(0, 1)] = 0.1;
+                    grid[point] = calc_equilibrium_predict(&grid[point]);
+                    grid[point] = force_unit_density(grid[point]);
+                }
+
+                //bound_circle(self.sim.bounds_mut(), (30, 35), 5);
+
+                self.sim.step(self.omega);
+                self.parts.step(self.sim.grid());
+                self.single_step = false;
             }
-            */
-            //self.sim.grid_mut()[(100, 100)][(1, 1)] = -0.5;
-            /*for k in 10..90 {
-                self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
-            }*/
-            let point = (20, 30);
-            let grid = self.sim.grid_mut();
-            grid[point][(2, 1)] = 0.1;
-            grid[point] = force_unit_density(grid[point]);
-
-            bound_circle(self.sim.bounds_mut(), (30, 35), 5);
-
-            self.sim.step(self.omega);
-            self.parts.step(self.sim.grid());
-            self.single_step = false;
         }
 
         // Update continuously
@@ -100,23 +105,23 @@ impl TemplateApp {
         let painter = ui.painter_at(rect);
 
         /*
-        let square_size = coords.sim_to_egui_vect(Vec2::ONE);
-        for j in 0..self.sim.grid().height() {
-            for i in 0..self.sim.grid().width() {
-                let min = Vec2::new(i as f32, j as f32);
-                let min = coords.sim_to_egui(min);
-                let rect = Rect::from_min_size(min, square_size.abs());
-                let rect = rect.expand(1.);
-                let coord = (i, j);
+           let square_size = coords.sim_to_egui_vect(Vec2::ONE);
+           for j in 0..self.sim.grid().height() {
+           for i in 0..self.sim.grid().width() {
+           let min = Vec2::new(i as f32, j as f32);
+           let min = coords.sim_to_egui(min);
+           let rect = Rect::from_min_size(min, square_size.abs());
+           let rect = rect.expand(1.);
+           let coord = (i, j);
 
-                let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
+           let vel = 25600.0 * calc_total_avg_velocity(&self.sim.grid()[coord]);
 
-                let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
+           let color = Color32::from_rgb(vel.x.abs() as u8, vel.y.abs() as u8, 0);
 
-                painter.rect_filled(rect, Rounding::none(), color);
-            }
-        }
-        */
+           painter.rect_filled(rect, Rounding::none(), color);
+           }
+           }
+           */
 
         for part in &self.parts.particles {
             let pt = coords.sim_to_egui(*part);
