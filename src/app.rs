@@ -75,6 +75,7 @@ impl eframe::App for TemplateApp {
 
                 bound_circle(self.sim.bounds_mut(), (20, 22), 5);
                 bound_circle(self.sim.bounds_mut(), (30, 35), 5);
+                bound_circle(self.sim.bounds_mut(), (40, 18), 5);
 
                 self.sim.step(self.omega);
                 self.parts.step(self.sim.grid(), self.sim.bounds());
@@ -268,6 +269,8 @@ impl Streamers {
     }
 
     pub fn step(&mut self, grid: &Array2D<GridCell<f32>>, bound: &Array2D<bool>) {
+        *self.particles.choose_mut(&mut rand::thread_rng()).unwrap() = random_particle(grid);
+
         for part in &mut self.particles {
             let x = part.x as usize;
             let y = part.y as usize;
