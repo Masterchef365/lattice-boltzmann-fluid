@@ -1,6 +1,6 @@
 use crate::array2d::{Array2D, GridPos};
 use crate::cell::GridCell;
-use crate::sim::{Sim, calc_total_avg_velocity};
+use crate::sim::{Sim, calc_total_avg_velocity, calc_equilibrium_predict, calc_total_density, weights};
 use eframe::egui::{DragValue, Grid, Rgba, RichText, ScrollArea, Slider, Ui};
 use egui::os::OperatingSystem;
 use egui::{CentralPanel, Frame, Rect, Sense};
@@ -54,7 +54,14 @@ impl eframe::App for TemplateApp {
             /*for k in 10..90 {
                 self.sim.grid_mut()[(10, k)][(1, 1)] = 0.5;
             }*/
-            self.sim.grid_mut()[(20, 30)][(2, 1)] = 0.3;
+            let point = (20, 30);
+            let grid = self.sim.grid_mut();
+            grid[point][(2, 1)] = 0.3;
+            dbg!(calc_total_density(&grid[point]));
+            //grid[point] = calc_equilibrium_predict(&grid[point]);
+            grid[point] = force_unit_density(grid[point]);
+            dbg!(calc_total_density(&grid[point]));
+
             bound_circle(self.sim.bounds_mut(), (30, 35), 5);
 
             self.sim.step(self.omega);
@@ -190,4 +197,14 @@ fn bound_circle(arr: &mut Array2D<bool>, center: (i32, i32), radius: i32) {
 fn bound_check<T>((x, y): (i32, i32), arr: &Array2D<T>) -> Option<(usize, usize)> {
     let in_bound = x >= 0 && y >= 0 && x < arr.width() as i32 && y < arr.height() as i32;
     in_bound.then(|| (x as usize, y as usize))
+}
+
+pub fn force_unit_density(mut cell: GridCell<f32>) -> GridCell<f32> {
+    let total = calc_total_density(&cell);
+    if total == 0. {
+        weights()
+    } else {
+        cell.data_mut().iter_mut().for_each(|x| *x /= total);
+        cell
+    }
 }

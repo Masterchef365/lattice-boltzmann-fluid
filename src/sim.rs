@@ -101,7 +101,7 @@ fn relative_index(xy: (usize, usize), uv: (i32, i32)) -> (usize, usize) {
 }
 
 /// D2Q9 weights
-fn weights() -> GridCell<f32> {
+pub fn weights() -> GridCell<f32> {
     let diag = 1. / 36.;
     let adj = 1. / 9.;
     let center = 4. / 9.;
@@ -131,7 +131,7 @@ fn velocities() -> GridCell<Vec2> {
     cell
 }
 
-fn calc_total_density(cell: &GridCell<f32>) -> f32 {
+pub fn calc_total_density(cell: &GridCell<f32>) -> f32 {
     cell.data().iter().copied().sum()
 }
 
@@ -143,7 +143,7 @@ pub fn calc_total_avg_velocity(cell: &GridCell<f32>) -> Vec2 {
         .sum()
 }
 
-fn calc_equilibrium_predict(cell: &GridCell<f32>) -> GridCell<f32> {
+pub fn calc_equilibrium_predict(cell: &GridCell<f32>) -> GridCell<f32> {
     let total_vel = calc_total_avg_velocity(cell);
     let total_vel_sq = total_vel.length_squared();
     let total_density = calc_total_density(cell);
