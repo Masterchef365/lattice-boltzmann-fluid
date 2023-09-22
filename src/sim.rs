@@ -140,10 +140,11 @@ pub fn calc_total_density(cell: &GridCell<f32>) -> f32 {
 }
 
 pub fn calc_total_avg_velocity(cell: &GridCell<f32>) -> Vec2 {
+    let density = calc_total_density(cell);
     cell.data()
         .iter()
         .zip(velocities().data())
-        .map(|(prob, vel)| *vel * *prob)
+        .map(|(prob, vel)| *vel * *prob / density)
         .sum()
 }
 
