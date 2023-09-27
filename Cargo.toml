@@ -17,6 +17,7 @@ eframe = { version = "0.22.0", default-features = false, features = [
 log = "0.4"
 glam = "0.24.1"
 rand = "0.8"
+shaderc = "*"
 
 # You only need serde if you want app persistence:
 # serde = { version = "1", features = ["derive"] }

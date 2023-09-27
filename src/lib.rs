@@ -4,5 +4,4 @@ mod app;
 pub use app::TemplateApp;
 
 mod array2d;
-mod sim;
 mod cell;
