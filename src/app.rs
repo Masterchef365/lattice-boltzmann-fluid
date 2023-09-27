@@ -67,6 +67,10 @@ impl eframe::App for TemplateApp {
                     //grid[point] = force_unit_density(grid[point]);
                 }
 
+                for k in 10..50 {
+                    self.sim.bounds_mut()[(40, k)] = true;
+                }
+
                 self.sim.grid_mut().data_mut()
                     .iter_mut()
                     .for_each(|cell| *cell = force_unit_density(*cell));
@@ -270,8 +274,10 @@ impl Streamers {
         *self.particles.choose_mut(&mut rand::thread_rng()).unwrap() = random_particle(grid);
 
         for part in &mut self.particles {
-            let x = part.x as usize;
-            let y = part.y as usize;
+            let virt_pos = *part - Vec2::splat(0.5);
+
+            let x = (virt_pos.x).max(0.) as usize;
+            let y = (virt_pos.y).max(0.) as usize;
             if bound[(x, y)] {
                 *part = random_particle(grid);
             } else {
@@ -279,7 +285,7 @@ impl Streamers {
                 let tr = calc_total_avg_velocity(&grid[(x + 1, y)]);
                 let bl = calc_total_avg_velocity(&grid[(x, y + 1)]);
                 let br = calc_total_avg_velocity(&grid[(x + 1, y + 1)]);
-                let frac = part.fract();
+                let frac = virt_pos - virt_pos.floor();
                 let top = tl.lerp(tr, frac.x);
                 let bottom = bl.lerp(br, frac.x);
                 let vel = top.lerp(bottom, frac.y);
