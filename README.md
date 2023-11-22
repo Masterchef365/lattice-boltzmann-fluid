@@ -1,21 +1,12 @@
-# Particle life And FLIP Fluid simulation
-This is a combination of a [FLIP fluid solver](https://youtu.be/XmzBREkK8kY), and a [Particle Life](https://youtu.be/p4YirERTVF0) simulation. On each page refresh, fresh rules are chosen for the particle life simulation. **This simulation is interactive, drag the particles around!**
+# Lattice boltzmann fluid simulation
+Simulation of incompressible fluids via the Lattice-Boltzmann method, see sources below.
 
-### Try the online version!
-https://masterchef365.github.io/pic-fluids/
+To run, you must have `cargo` installed via `rustup`.
 
-### Test locally
-Make sure you are using the latest version of stable rust by running `rustup update`.
+Then you can do `cargo run` in the root of this repo.
 
-`cargo run --release`
+## Citations
+Weber State University. "Lattice-Boltzmann Fluid Dynamics Physics 3300, Spring Semester, 2012." Physics Department, 2012, https://physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf.
 
-On Linux you need to first run:
-
-`sudo apt-get install libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libssl-dev`
-
-On Fedora Rawhide you need to run:
-
-`dnf install clang clang-devel clang-tools-extra libxkbcommon-devel pkg-config openssl-devel libxcb-devel gtk3-devel atk fontconfig-devel`
-
-### Web Deploy
-Just run `trunk build --release`.
+Inspired by this:
+Mocz, P. (2022, November 29). Create your own Lattice Boltzmann simulation (With Python). Medium. https://medium.com/swlh/create-your-own-lattice-boltzmann-simulation-with-python-8759e8b53b1c
